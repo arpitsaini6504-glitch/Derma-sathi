@@ -16,10 +16,25 @@ function getAuthHeader(): Record<string, string> {
   return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
+function getLanguageHeader(): Record<string, string> {
+  const lang = localStorage.getItem('dermasathi_preferred_language') || 'en';
+  return { 'Accept-Language': lang };
+}
+
+function getStandardHeaders(isJson: boolean = true): Record<string, string> {
+  return {
+    ...(isJson ? { 'Content-Type': 'application/json' } : {}),
+    ...getAuthHeader(),
+    ...getLanguageHeader()
+  };
+}
+
 export const api = {
   async getHealthStatus() {
     try {
-      const res = await fetch(`${API_BASE}/health/status`);
+      const res = await fetch(`${API_BASE}/health/status`, {
+        headers: getLanguageHeader()
+      });
       return await res.json();
     } catch (e) {
       return { status: 'offline', message: 'Backend unreachable' };

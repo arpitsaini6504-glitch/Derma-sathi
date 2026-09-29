@@ -488,3 +488,81 @@ body.high-contrast .glass-card {
   font-size: 0.88rem;
   color: var(--text-muted);
 }
+
+/* ==============================================================================
+   Multilingual & Internationalization Layout Resilience (12 Indian Languages)
+   Prevents longer translated strings from clipping or breaking grid/flex layouts
+   ============================================================================== */
+
+/* Safe word break and hyphenation across all languages */
+body, p, span, h1, h2, h3, h4, h5, h6, label, button, a {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
+
+/* Ensure buttons flex-grow and wrap text cleanly without overflow */
+button, .btn, .btn-primary, .btn-secondary, .btn-danger {
+  white-space: normal;
+  min-height: 44px;
+  line-height: 1.35;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/* Ensure flex parents wrap items gracefully when localized text expands */
+.flex-wrap-resilient {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Script-specific typography adjustments for optimal legibility */
+html[lang='hi'], html[lang='mr'], html[data-script='Devanagari'] {
+  --font-body: 'Plus Jakarta Sans', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.65;
+}
+
+html[lang='ta'], html[data-script='Tamil'] {
+  --font-body: 'Plus Jakarta Sans', 'Noto Sans Tamil', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.7;
+}
+
+html[lang='te'], html[data-script='Telugu'] {
+  --font-body: 'Plus Jakarta Sans', 'Noto Sans Telugu', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.7;
+}
+
+html[lang='kn'], html[data-script='Kannada'] {
+  --font-body: 'Plus Jakarta Sans', 'Noto Sans Kannada', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.7;
+}
+
+html[lang='ml'], html[data-script='Malayalam'] {
+  --font-body: 'Plus Jakarta Sans', 'Noto Sans Malayalam', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.75;
+}
+
+html[lang='bn'], html[lang='as'], html[data-script='Bengali'], html[data-script='Bengali-Assamese'] {
+  --font-body: 'Plus Jakarta Sans', 'Noto Sans Bengali', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.65;
+}
+
+html[lang='gu'], html[data-script='Gujarati'] {
+  --font-body: 'Plus Jakarta Sans', 'Noto Sans Gujarati', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.65;
+}
+
+html[lang='pa'], html[data-script='Gurmukhi'] {
+  --font-body: 'Plus Jakarta Sans', 'Noto Sans Gurmukhi', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.65;
+}
+
+html[lang='or'], html[data-script='Odia'] {
+  --font-body: 'Plus Jakarta Sans', 'Noto Sans Oriya', -apple-system, BlinkMacSystemFont, sans-serif;
+  line-height: 1.7;
+}
+
