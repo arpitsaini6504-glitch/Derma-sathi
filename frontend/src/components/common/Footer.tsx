@@ -17,7 +17,7 @@ export const Footer: React.FC = () => {
             </p>
           </div>
 
-          <div>
+          {/* <div>
             <h4 style={{ marginBottom: '10px' }}>Architecture & Core Pillars</h4>
             <ul style={{ listStyle: 'none', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <li>8-Stage Clinical Safety Pipeline</li>
@@ -25,9 +25,9 @@ export const Footer: React.FC = () => {
               <li>Decoupled ML Model Store</li>
               <li>Emergency Red-Flag Escalation</li>
             </ul>
-          </div>
+          </div> */}
 
-          <div>
+          {/* <div>
             <h4 style={{ marginBottom: '10px' }}>Engineering Team</h4>
             <ul style={{ listStyle: 'none', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '6px' }}>
               <li><strong>Arpit:</strong> ML Systems, Model Integration & APIs</li>
@@ -35,7 +35,7 @@ export const Footer: React.FC = () => {
               <li><strong>Archana:</strong> QA, API Testing & Multilingual Verification</li>
               <li><strong>Arpit Saini:</strong> Frontend Implementation & Integration</li>
             </ul>
-          </div>
+          </div> */}
         </div>
 
         <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '20px', textAlign: 'center', fontSize: '0.8rem' }}>

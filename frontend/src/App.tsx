@@ -100,8 +100,8 @@ export const AppContent: React.FC = () => {
         onToggleDrawer={() => setIsDrawerOpen(true)}
       />
 
-      {/* Footer */}
-      <Footer />
+      {/* Footer (Rendered only on Home page) */}
+      {currentTab === 'home' && <Footer />}
 
       {/* Patient Auth Modal */}
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
