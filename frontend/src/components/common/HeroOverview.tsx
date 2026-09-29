@@ -16,7 +16,6 @@ import {
   HelpCircle
 } from 'lucide-react';
 import { api } from '../../services/api';
-import { VoiceAssistButton } from './VoiceAssistButton';
 
 interface HeroProps {
   onSelectTab: (tab: string) => void;
@@ -107,9 +106,6 @@ export const HeroOverview: React.FC<HeroProps> = ({ onSelectTab }) => {
       <div style={{ textAlign: 'center', padding: '36px 0 24px' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '14px', flexWrap: 'wrap', justifyContent: 'center' }}>
           <span className="badge badge-pending">PAN-INDIA MULTILINGUAL HEALTHCARE</span>
-          <VoiceAssistButton
-            textToSpeak={`${t('app.name')}. ${t('app.tagline')}. You can tap any card below to start a skin analysis, check symptoms, or assess emergency risks.`}
-          />
         </div>
 
         <h1 style={{ fontSize: 'clamp(2rem, 4.5vw, 3rem)', lineHeight: 1.18, marginBottom: '14px' }}>
