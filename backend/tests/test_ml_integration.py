@@ -17,12 +17,14 @@ def test_model_loader_singleton_cached():
     l2 = ModelLoader()
     assert l1 is l2
 
-def test_inference_service_predict_returns_controlled_error():
+def test_inference_service_predict_returns_controlled_error(clear_synthetic_image_bytes):
     service = SkinInferenceService()
-    # When model is absent, predict must raise ModelNotAvailableError with MODEL_NOT_AVAILABLE code
+    # When clear image passes quality gate but model is absent, predict must raise ModelNotAvailableError
     with pytest.raises(ModelNotAvailableError) as exc_info:
-        service.predict(b"fake_image_bytes")
+        service.predict(clear_synthetic_image_bytes)
     assert exc_info.value.error_code == "MODEL_NOT_AVAILABLE"
+    assert exc_info.value.quality_assessment is not None
+    assert exc_info.value.quality_assessment.quality_status == "pass"
 
 def test_inference_service_empty_image():
     service = SkinInferenceService()
@@ -44,8 +46,10 @@ def test_api_skin_analyze_returns_model_unavailable(client: TestClient, clear_sy
     assert data["requires_professional_review"] is True
     assert "trained skin model is not deployed" in data["message"].lower()
 
-    # Placeholders verification
-    assert data["image_quality_gate"]["is_evaluated"] is False
+    # Preprocessing quality gate is now activated and verified
+    assert data["image_quality_gate"]["is_evaluated"] is True
+    assert data["quality_assessment"] is not None
+    assert data["quality_assessment"]["quality_status"] == "pass"
     assert data["ood_detection"]["is_evaluated"] is False
     assert data["confidence_calibration"]["is_calibrated"] is False
     assert data["abstention_policy"]["enforced"] is True

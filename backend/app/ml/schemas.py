@@ -1,5 +1,19 @@
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 from pydantic import BaseModel, Field
+
+# ==============================================================================
+# Quality Gate Schemas
+# ==============================================================================
+
+class QualityGateResult(BaseModel):
+    """
+    Standardized image acquisition quality result for clinical safety validation.
+    """
+    quality_status: str = Field(..., description="'pass' or 'reject'")
+    issues: List[str] = Field(default_factory=list, description="Specific acquisition failures: 'excessive_blur', 'insufficient_lighting', etc.")
+    metrics: Dict[str, Any] = Field(default_factory=dict, description="Raw computed clarity, dynamic range, and resolution numbers")
+    feedback_messages: List[str] = Field(default_factory=list, description="Patient-facing guidance on how to retake the photo")
+
 
 # ==============================================================================
 # Future ML Pipeline Placeholders / Interfaces
@@ -109,6 +123,10 @@ class SkinAnalysisMLResponse(BaseModel):
     message: str = Field(
         ...,
         description="Human-readable status or clinical guidance message."
+    )
+    quality_assessment: Optional[QualityGateResult] = Field(
+        None,
+        description="Image acquisition quality assessment: {quality_status: 'pass'|'reject', issues: [...]}"
     )
 
     # Future Pipeline Placeholders

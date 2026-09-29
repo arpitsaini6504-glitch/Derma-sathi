@@ -2,6 +2,7 @@
 Clinical & ML Service Exceptions for DERMASATHIAI.
 Controlled error definitions to prevent raw system tracebacks from leaking to users.
 """
+from typing import Optional, Any
 
 class MLServiceException(Exception):
     """Base exception for all ML subsystem operations."""
@@ -20,9 +21,11 @@ class ModelNotAvailableError(MLServiceException):
     def __init__(
         self,
         message: str = "Trained skin model is not deployed in model_store/. Clinical fail-safe abstention enforced.",
-        error_code: str = "MODEL_NOT_AVAILABLE"
+        error_code: str = "MODEL_NOT_AVAILABLE",
+        quality_assessment: Optional[Any] = None
     ):
         super().__init__(message, error_code)
+        self.quality_assessment = quality_assessment
 
 
 class InvalidImagePayloadError(MLServiceException):

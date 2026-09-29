@@ -66,6 +66,12 @@ async def analyze_skin(file: UploadFile = File(...)):
         except ModelNotAvailableError as e:
             # Convert controlled service-level error into structured non-diagnostic response
             logger.info(f"[/skin/analyze] Controlled model absence: {e.message}")
+            quality_placeholder = ImageQualityGatePlaceholder(
+                is_evaluated=e.quality_assessment is not None,
+                blur_score=e.quality_assessment.metrics.get("blur_score") if e.quality_assessment else None,
+                illumination_score=e.quality_assessment.metrics.get("underexposed_pixel_ratio") if e.quality_assessment else None,
+                feedback="; ".join(e.quality_assessment.feedback_messages) if e.quality_assessment and e.quality_assessment.feedback_messages else "Acquisition verified."
+            )
             return SkinAnalysisMLResponse(
                 status=e.error_code,  # 'MODEL_NOT_AVAILABLE'
                 prediction=None,
@@ -78,7 +84,8 @@ async def analyze_skin(file: UploadFile = File(...)):
                     "Trained skin model is not deployed in backend/model_store/. "
                     "Clinical fail-safe abstention enforced. Please consult a qualified dermatologist."
                 ),
-                image_quality_gate=ImageQualityGatePlaceholder(),
+                quality_assessment=e.quality_assessment,
+                image_quality_gate=quality_placeholder,
                 ood_detection=OODDetectionPlaceholder(),
                 confidence_calibration=ConfidenceCalibrationPlaceholder(),
                 abstention_policy=AbstentionPolicyPlaceholder(
