@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Activity, PhoneCall, Moon, Sun, User as UserIcon } from 'lucide-react';
+import { Activity, Moon, Sun, User as UserIcon } from 'lucide-react';
 import { LanguageSelector } from './LanguageSelector';
 import { useAuth } from '../../context/AuthContext';
 
@@ -74,21 +74,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentTab, onSelectTab, onOpenA
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          {/* Emergency Hotline Button */}
-          <a
-            href="tel:112"
-            className="btn btn-danger"
-            style={{
-              padding: '6px 12px',
-              fontSize: '0.82rem',
-              borderRadius: 'var(--radius-sm)'
-            }}
-            title="Dial National Emergency Ambulance"
-          >
-            <PhoneCall size={14} />
-            <span>112 / 108</span>
-          </a>
-
           <LanguageSelector />
 
           <button

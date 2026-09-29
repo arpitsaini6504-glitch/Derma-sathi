@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Activity, PhoneCall, Menu, Sun, Moon } from 'lucide-react';
+import { Activity, Menu, Sun, Moon } from 'lucide-react';
 import { LanguageSelector } from './LanguageSelector';
 
 interface TopAppBarProps {
@@ -10,7 +9,6 @@ interface TopAppBarProps {
 }
 
 export const TopAppBar: React.FC<TopAppBarProps> = ({ currentTab, onSelectTab, onToggleDrawer }) => {
-  const { t } = useTranslation();
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     return (document.documentElement.getAttribute('data-theme') as 'light' | 'dark') || 'light';
   });
@@ -67,23 +65,6 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({ currentTab, onSelectTab, o
 
         {/* Action Controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Emergency 112/108 calling button */}
-          <a
-            href="tel:112"
-            className="btn btn-danger"
-            style={{
-              minHeight: '48px',
-              padding: '8px 14px',
-              fontSize: '0.88rem',
-              borderRadius: 'var(--radius-md)',
-              fontWeight: 700
-            }}
-            aria-label="Dial Emergency 112 or 108"
-          >
-            <PhoneCall size={16} />
-            <span>112 / 108</span>
-          </a>
-
           {/* Prominent Language Selector with accessible touch target */}
           <LanguageSelector />
 
