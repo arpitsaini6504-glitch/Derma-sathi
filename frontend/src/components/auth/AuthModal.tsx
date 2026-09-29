@@ -82,10 +82,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         </button>
 
         <h3 style={{ fontSize: '1.25rem', marginBottom: '6px' }}>
-          {isRegister ? 'Create Patient Account' : 'Sign in to DERMASATHI'}
+          {isRegister ? t('authentication.register_title') : t('authentication.login_title')}
         </h3>
         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '20px' }}>
-          Access personalized skin wellness history & triage logs.
+          {t('app.tagline')}
         </p>
 
         {error && (
@@ -98,7 +98,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           {isRegister && (
             <>
               <div className="form-group">
-                <label className="form-label">Full Name</label>
+                <label className="form-label">{t('authentication.full_name_label')}</label>
                 <div style={{ position: 'relative' }}>
                   <input
                     type="text"
@@ -112,7 +112,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Preferred Indian Language</label>
+                <label className="form-label">{t('authentication.preferred_language_label')}</label>
                 <select
                   className="form-control"
                   value={prefLang}
@@ -129,7 +129,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           )}
 
           <div className="form-group">
-            <label className="form-label">Email Address</label>
+            <label className="form-label">{t('authentication.email_label')}</label>
             <input
               type="email"
               required
@@ -141,7 +141,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </div>
 
           <div className="form-group">
-            <label className="form-label">Password</label>
+            <label className="form-label">{t('authentication.password_label')}</label>
             <input
               type="password"
               required
@@ -159,31 +159,31 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             disabled={loading}
             style={{ width: '100%', padding: '12px', marginTop: '10px' }}
           >
-            {loading ? 'Processing...' : isRegister ? 'Register & Continue' : 'Sign In'}
+            {loading ? t('common.loading') : isRegister ? t('authentication.register_button') : t('authentication.login_button')}
           </button>
         </form>
 
         <div style={{ textAlign: 'center', marginTop: '18px', fontSize: '0.85rem' }}>
           {isRegister ? (
             <span>
-              Already have an account?{' '}
+              {t('authentication.already_have_account')}{' '}
               <button
                 type="button"
                 onClick={() => setIsRegister(false)}
                 style={{ background: 'none', border: 'none', color: 'var(--primary-600)', fontWeight: 600, cursor: 'pointer' }}
               >
-                Sign In
+                {t('navigation.login')}
               </button>
             </span>
           ) : (
             <span>
-              New to DERMASATHIAI?{' '}
+              {t('authentication.need_account')}{' '}
               <button
                 type="button"
                 onClick={() => setIsRegister(true)}
                 style={{ background: 'none', border: 'none', color: 'var(--primary-600)', fontWeight: 600, cursor: 'pointer' }}
               >
-                Register Here
+                {t('navigation.register')}
               </button>
             </span>
           )}

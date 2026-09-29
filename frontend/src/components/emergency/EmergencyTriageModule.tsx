@@ -58,13 +58,13 @@ export const EmergencyTriageModule: React.FC = () => {
           <textarea
             className="form-control"
             rows={2}
-            placeholder="Briefly describe sudden onset symptoms..."
+            placeholder={t('emergency.placeholder_desc')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
           />
         </div>
 
-        <h4 style={{ fontSize: '0.92rem', marginBottom: '12px' }}>Check any of the following if currently present:</h4>
+        <h4 style={{ fontSize: '0.92rem', marginBottom: '12px' }}>{t('emergency.flags_prompt')}</h4>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '10px', marginBottom: '20px' }}>
           <label style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.88rem', cursor: 'pointer' }}>
             <input type="checkbox" checked={flagFace} onChange={(e) => setFlagFace(e.target.checked)} />
@@ -111,7 +111,7 @@ export const EmergencyTriageModule: React.FC = () => {
                 {assessment.triage_priority}
               </span>
               <h3 style={{ marginTop: '8px' }}>
-                {assessment.is_emergency ? t('emergency.emergency_alert') : 'Standard Evaluation Advised'}
+                {assessment.is_emergency ? t('emergency.emergency_alert') : t('emergency.standard_eval')}
               </h3>
             </div>
             <VoiceAssistButton
@@ -152,7 +152,7 @@ export const EmergencyTriageModule: React.FC = () => {
                     style={{ marginTop: '12px', padding: '6px 12px', fontSize: '0.85rem' }}
                   >
                     <PhoneCall size={14} />
-                    <span>Call {contact.contact_number}</span>
+                    <span>{t('emergency.call_btn')} {contact.contact_number}</span>
                   </a>
                 </div>
               ))}

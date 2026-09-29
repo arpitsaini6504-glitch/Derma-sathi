@@ -90,7 +90,7 @@ export const HealthcareAccessModule: React.FC = () => {
                   onClick={() => alert(`Directions for ${fac.facility_name} will query the National Health Portal API.`)}
                   style={{ fontSize: '0.85rem', padding: '6px 14px' }}
                 >
-                  View OPD Timings & Directions
+                  {t('facilities.view_opd_btn')}
                 </button>
               )}
             </div>

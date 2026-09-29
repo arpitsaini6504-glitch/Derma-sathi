@@ -49,9 +49,9 @@ export const PatientProfileModule: React.FC<{ onOpenAuth: () => void }> = ({ onO
               <User size={28} />
             </div>
             <div>
-              <h3 style={{ fontSize: '1.15rem' }}>{isAuthenticated ? user?.full_name : 'Guest Patient'}</h3>
+              <h3 style={{ fontSize: '1.15rem' }}>{isAuthenticated ? user?.full_name : t('profile.guest_user')}</h3>
               <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                {isAuthenticated ? user?.email : 'Anonymous local session • No login required for basic triage'}
+                {isAuthenticated ? user?.email : t('profile.guest_sub')}
               </p>
             </div>
           </div>
@@ -63,7 +63,7 @@ export const PatientProfileModule: React.FC<{ onOpenAuth: () => void }> = ({ onO
                 onClick={logout}
                 style={{ minHeight: '44px', padding: '8px 16px' }}
               >
-                Sign Out
+                {t('navigation.logout')}
               </button>
             ) : (
               <button
@@ -71,7 +71,7 @@ export const PatientProfileModule: React.FC<{ onOpenAuth: () => void }> = ({ onO
                 onClick={onOpenAuth}
                 style={{ minHeight: '48px', padding: '10px 20px' }}
               >
-                Sign In / Register
+                {t('navigation.login')} / {t('navigation.register')}
               </button>
             )}
           </div>
@@ -112,7 +112,7 @@ export const PatientProfileModule: React.FC<{ onOpenAuth: () => void }> = ({ onO
           {cacheCleared && (
             <span style={{ fontSize: '0.85rem', color: 'var(--emerald-500)', display: 'flex', alignItems: 'center', gap: '4px' }}>
               <Check size={16} />
-              Cache cleared
+              {t('profile.cache_cleared_msg')}
             </span>
           )}
         </div>

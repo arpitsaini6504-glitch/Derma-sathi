@@ -59,7 +59,7 @@ export const MedicalReportsModule: React.FC = () => {
       <div className="glass-card" style={{ marginBottom: '24px', textAlign: 'center' }}>
         <h3 style={{ fontSize: '1.1rem', marginBottom: '8px' }}>{t('reports.upload_title')}</h3>
         <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-          Biopsy notes, blood tests, fungal cultures, or allergy test summaries.
+          {t('reports.upload_desc')}
         </p>
 
         <label
@@ -98,7 +98,7 @@ export const MedicalReportsModule: React.FC = () => {
         </div>
       </div>
 
-      {isUploading && <LoadingState title="Uploading & Securing Document..." />}
+      {isUploading && <LoadingState title={t('reports.uploading_doc', 'Uploading & Securing Document...')} />}
 
       {/* Reports List or Empty State */}
       {!isUploading && reports.length === 0 ? (
@@ -155,13 +155,13 @@ export const MedicalReportsModule: React.FC = () => {
                   style={{ minHeight: '44px', padding: '8px 14px', fontSize: '0.85rem' }}
                 >
                   <Eye size={16} />
-                  <span>View</span>
+                  <span>{t('common.view', 'View')}</span>
                 </button>
                 <button
                   className="btn btn-outline"
                   onClick={() => removeReport(report.id)}
                   style={{ minHeight: '44px', padding: '8px 12px', color: 'var(--rose-600)' }}
-                  aria-label="Delete document"
+                  aria-label={t('common.delete_doc', 'Delete document')}
                 >
                   <Trash2 size={16} />
                 </button>

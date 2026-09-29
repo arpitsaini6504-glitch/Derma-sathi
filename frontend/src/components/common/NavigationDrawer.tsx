@@ -35,17 +35,17 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
   if (!isOpen) return null;
 
   const allDestinations = [
-    { key: 'home', labelKey: 'nav.home', desc: 'Overview and rapid health check', icon: <Home size={22} color="var(--primary-600)" /> },
-    { key: 'symptoms', labelKey: 'nav.symptoms', desc: 'Identify symptoms & red flags', icon: <Activity size={22} color="var(--primary-600)" /> },
-    { key: 'skin', labelKey: 'nav.skin', desc: '8-stage clinical photo evaluation', icon: <Camera size={22} color="var(--primary-600)" /> },
-    { key: 'reports', labelKey: 'nav.reports', desc: 'Biopsy and pathology test reports', icon: <FileText size={22} color="var(--primary-600)" /> },
-    { key: 'prescription', labelKey: 'nav.prescription', desc: 'Prescription scan & dosage check', icon: <FileCheck2 size={22} color="var(--primary-600)" /> },
-    { key: 'medicines', labelKey: 'nav.medicines', desc: 'Drug interactions & allergy safety', icon: <Pill size={22} color="var(--primary-600)" /> },
-    { key: 'lifestyle', labelKey: 'nav.lifestyle', desc: 'Barrier hydration & daily habits', icon: <Sparkles size={22} color="var(--emerald-500)" /> },
-    { key: 'ayurveda', labelKey: 'nav.ayurveda', desc: 'Prakriti dosha balance & Ritucharya', icon: <Leaf size={22} color="var(--emerald-500)" /> },
-    { key: 'emergency', labelKey: 'nav.emergency', desc: 'Immediate red-flag danger triage', icon: <ShieldAlert size={22} color="var(--rose-600)" />, isEmergency: true },
-    { key: 'profile', labelKey: 'nav.profile', desc: 'Language, account & history', icon: <User size={22} color="var(--primary-600)" /> },
-    { key: 'settings', labelKey: 'nav.settings', desc: 'Text size, contrast & low bandwidth', icon: <Settings size={22} color="var(--text-muted)" /> }
+    { key: 'home', labelKey: 'nav.home', descKey: 'nav.desc_home', icon: <Home size={22} color="var(--primary-600)" /> },
+    { key: 'symptoms', labelKey: 'nav.symptoms', descKey: 'nav.desc_symptoms', icon: <Activity size={22} color="var(--primary-600)" /> },
+    { key: 'skin', labelKey: 'nav.skin', descKey: 'nav.desc_skin', icon: <Camera size={22} color="var(--primary-600)" /> },
+    { key: 'reports', labelKey: 'nav.reports', descKey: 'nav.desc_reports', icon: <FileText size={22} color="var(--primary-600)" /> },
+    { key: 'prescription', labelKey: 'nav.prescription', descKey: 'nav.desc_prescription', icon: <FileCheck2 size={22} color="var(--primary-600)" /> },
+    { key: 'medicines', labelKey: 'nav.medicines', descKey: 'nav.desc_medicines', icon: <Pill size={22} color="var(--primary-600)" /> },
+    { key: 'lifestyle', labelKey: 'nav.lifestyle', descKey: 'nav.desc_lifestyle', icon: <Sparkles size={22} color="var(--emerald-500)" /> },
+    { key: 'ayurveda', labelKey: 'nav.ayurveda', descKey: 'nav.desc_ayurveda', icon: <Leaf size={22} color="var(--emerald-500)" /> },
+    { key: 'emergency', labelKey: 'nav.emergency', descKey: 'nav.desc_emergency', icon: <ShieldAlert size={22} color="var(--rose-600)" />, isEmergency: true },
+    { key: 'profile', labelKey: 'nav.profile', descKey: 'nav.desc_profile', icon: <User size={22} color="var(--primary-600)" /> },
+    { key: 'settings', labelKey: 'nav.settings', descKey: 'nav.desc_settings', icon: <Settings size={22} color="var(--text-muted)" /> }
   ];
 
   const handleItemClick = (key: string) => {
@@ -92,7 +92,7 @@ export const NavigationDrawer: React.FC<NavigationDrawerProps> = ({
                 <div className="drawer-item-icon">{dest.icon}</div>
                 <div style={{ flex: 1, textAlign: 'left' }}>
                   <div style={{ fontWeight: 600, fontSize: '0.96rem' }}>{t(dest.labelKey)}</div>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{dest.desc}</div>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>{t(dest.descKey)}</div>
                 </div>
                 <ChevronRight size={18} style={{ opacity: 0.5 }} />
               </button>

@@ -43,7 +43,7 @@ export const PrescriptionModule: React.FC = () => {
       <div className="glass-card" style={{ marginBottom: '24px', textAlign: 'center' }}>
         <h3 style={{ fontSize: '1.1rem', marginBottom: '6px' }}>{t('prescription.upload_title')}</h3>
         <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', marginBottom: '18px' }}>
-          Take a flat, glare-free picture of your doctor's written prescription slip.
+          {t('prescription.upload_desc')}
         </p>
 
         <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
@@ -67,11 +67,11 @@ export const PrescriptionModule: React.FC = () => {
             fontSize: '0.82rem'
           }}
         >
-          <strong>Medical Mandate:</strong> {t('prescription.doctor_note')}
+          <strong>{t('prescription.medical_mandate')}:</strong> {t('prescription.doctor_note')}
         </div>
       </div>
 
-      {isProcessing && <LoadingState title="Scanning Prescription Slip..." description="Extracting text lines & matching pharmacology database." />}
+      {isProcessing && <LoadingState title={t('prescription.scanning_title')} description={t('prescription.scanning_desc')} />}
 
       {!isProcessing && !hasScanned ? (
         <EmptyState
@@ -87,7 +87,7 @@ export const PrescriptionModule: React.FC = () => {
             <h4 style={{ fontSize: '1.05rem', color: 'var(--primary-700)' }}>{t('prescription.extracted_medicines')}</h4>
             <span className="badge badge-success">
               <CheckCircle2 size={13} />
-              Verified with Prescriber Format
+              {t('prescription.verified_prescriber')}
             </span>
           </div>
 
@@ -111,7 +111,7 @@ export const PrescriptionModule: React.FC = () => {
                 </div>
 
                 <p style={{ fontSize: '0.88rem', color: 'var(--text-main)', marginTop: '6px' }}>
-                  <strong>Instructions:</strong> {item.dosage}
+                  <strong>{t('prescription.instructions_label')}:</strong> {item.dosage}
                 </p>
 
                 <div

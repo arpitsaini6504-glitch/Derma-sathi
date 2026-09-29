@@ -26,65 +26,65 @@ export const HeroOverview: React.FC<HeroProps> = ({ onSelectTab }) => {
       key: 'skin',
       icon: <Camera size={26} style={{ color: 'var(--primary-600)' }} />,
       titleKey: 'nav.skin',
-      desc: '3-step photo check with automated focus & illumination gate.',
-      actionText: 'Take / Upload Photo'
+      descKey: 'home.card_skin_desc',
+      actionKey: 'home.action_skin_btn'
     },
     {
       key: 'symptoms',
       icon: <Activity size={26} style={{ color: 'var(--primary-600)' }} />,
       titleKey: 'nav.symptoms',
-      desc: 'Interactive symptom selector with instant clinical red-flag detection.',
-      actionText: 'Check Symptoms'
+      descKey: 'home.card_symptoms_desc',
+      actionKey: 'home.action_symptoms_btn'
     },
     {
       key: 'emergency',
       icon: <ShieldAlert size={26} style={{ color: 'var(--rose-600)' }} />,
       titleKey: 'nav.emergency',
-      desc: 'Urgent check for fever, facial swelling, blistering, or mucosal peeling.',
-      actionText: 'Assess Emergency Risk',
+      descKey: 'home.card_emergency_desc',
+      actionKey: 'home.action_emergency_btn',
       isEmergency: true
     },
     {
       key: 'medicines',
       icon: <Pill size={26} style={{ color: 'var(--primary-600)' }} />,
       titleKey: 'nav.medicines',
-      desc: 'Verify safe combinations for skin creams, antibiotics, and retinoids.',
-      actionText: 'Check Drug Safety'
+      descKey: 'home.card_medicines_desc',
+      actionKey: 'home.action_medicines_btn'
     },
     {
       key: 'reports',
       icon: <FileText size={26} style={{ color: 'var(--primary-600)' }} />,
       titleKey: 'nav.reports',
-      desc: 'Organize and preview biopsy reports and diagnostic lab tests.',
-      actionText: 'Upload Reports'
+      descKey: 'home.card_reports_desc',
+      actionKey: 'home.action_reports_btn'
     },
     {
       key: 'prescription',
       icon: <FileCheck2 size={26} style={{ color: 'var(--primary-600)' }} />,
       titleKey: 'nav.prescription',
-      desc: 'Scan written prescriptions to verify dosage and application guidelines.',
-      actionText: 'Scan Prescription'
+      descKey: 'home.card_prescription_desc',
+      actionKey: 'home.action_prescription_btn'
     },
     {
       key: 'lifestyle',
       icon: <Sparkles size={26} style={{ color: 'var(--emerald-500)' }} />,
       titleKey: 'nav.lifestyle',
-      desc: 'Skin barrier hydration, sun defense (SPF 30+), and healthy habits.',
-      actionText: 'View Barrier Tips'
+      descKey: 'home.card_lifestyle_desc',
+      actionKey: 'home.action_lifestyle_btn'
     },
     {
       key: 'ayurveda',
       icon: <Leaf size={26} style={{ color: 'var(--emerald-500)' }} />,
       titleKey: 'nav.ayurveda',
-      desc: 'Prakriti dosha balance, seasonal Ritucharya, and gentle herbal care.',
-      actionText: 'Explore Ayurvedic Regimen'
+      descKey: 'home.card_ayurveda_desc',
+      actionKey: 'home.action_ayurveda_btn'
     },
     {
       key: 'facilities',
       icon: <Building2 size={26} style={{ color: 'var(--primary-600)' }} />,
       titleKey: 'nav.facilities',
-      desc: 'Find District Hospitals, Ayushman Arogya Mandirs, and eSanjeevani Teleconsultation.',
-      actionText: 'Find Nearby Care'
+      descKey: 'home.card_facilities_desc',
+      actionKey: 'home.action_facilities_btn'
     }
   ];
 
@@ -93,19 +93,17 @@ export const HeroOverview: React.FC<HeroProps> = ({ onSelectTab }) => {
       {/* Low-Digital Literacy Friendly Audio & Hero Banner */}
       <div style={{ textAlign: 'center', padding: '36px 0 24px' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '14px', flexWrap: 'wrap', justifyContent: 'center' }}>
-          <span className="badge badge-pending">PAN-INDIA MULTILINGUAL HEALTHCARE</span>
+          <span className="badge badge-pending">{t('home.badge_healthcare', 'PAN-INDIA MULTILINGUAL HEALTHCARE')}</span>
         </div>
 
         <h1 style={{ fontSize: 'clamp(2rem, 4.5vw, 3rem)', lineHeight: 1.18, marginBottom: '14px' }}>
-          Multilingual Dermatology &<br />
-          <span style={{ color: 'var(--primary-600)' }}>Comprehensive Health Companion</span>
+          {t('home.hero_title_part1', 'Multilingual Dermatology &')}<br />
+          <span style={{ color: 'var(--primary-600)' }}>{t('home.hero_title_part2', 'Comprehensive Health Companion')}</span>
         </h1>
 
         <p style={{ maxWidth: '640px', margin: '0 auto 20px', color: 'var(--text-muted)', fontSize: '1rem', lineHeight: 1.5 }}>
           {t('app.tagline')}
         </p>
-
-
 
         {/* Primary Action Buttons with Min 48px Touch Targets */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
@@ -115,7 +113,7 @@ export const HeroOverview: React.FC<HeroProps> = ({ onSelectTab }) => {
             style={{ minHeight: '52px', padding: '14px 28px', fontSize: '1.05rem', fontWeight: 600 }}
           >
             <Camera size={20} />
-            <span>Start Skin Analysis</span>
+            <span>{t('home.btn_start_skin', 'Start Skin Analysis')}</span>
           </button>
 
           <button
@@ -124,7 +122,7 @@ export const HeroOverview: React.FC<HeroProps> = ({ onSelectTab }) => {
             style={{ minHeight: '52px', padding: '14px 28px', fontSize: '1.05rem', fontWeight: 600 }}
           >
             <Activity size={20} />
-            <span>Symptom Triage</span>
+            <span>{t('home.btn_symptom_triage', 'Symptom Triage')}</span>
           </button>
         </div>
       </div>
@@ -146,7 +144,7 @@ export const HeroOverview: React.FC<HeroProps> = ({ onSelectTab }) => {
             role="button"
             tabIndex={0}
             onKeyDown={(e) => e.key === 'Enter' && onSelectTab(card.key)}
-            aria-label={`${t(card.titleKey)}: ${card.desc}`}
+            aria-label={`${t(card.titleKey)}: ${t(card.descKey)}`}
           >
             <div>
               <div
@@ -169,7 +167,7 @@ export const HeroOverview: React.FC<HeroProps> = ({ onSelectTab }) => {
               </h3>
 
               <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', lineHeight: 1.45 }}>
-                {card.desc}
+                {t(card.descKey)}
               </p>
             </div>
 
@@ -185,7 +183,7 @@ export const HeroOverview: React.FC<HeroProps> = ({ onSelectTab }) => {
                 minHeight: '44px'
               }}
             >
-              <span>{card.actionText}</span>
+              <span>{t(card.actionKey)}</span>
               <ArrowRight size={16} />
             </div>
           </div>
