@@ -12,8 +12,7 @@ import {
   Sparkles,
   CheckCircle2,
   PhoneCall,
-  ArrowRight,
-  HelpCircle
+  ArrowRight
 } from 'lucide-react';
 import { api } from '../../services/api';
 
@@ -117,23 +116,7 @@ export const HeroOverview: React.FC<HeroProps> = ({ onSelectTab }) => {
           {t('app.tagline')}
         </p>
 
-        {/* Low literacy help pill */}
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '8px',
-            backgroundColor: 'var(--primary-50)',
-            color: 'var(--primary-700)',
-            padding: '8px 16px',
-            borderRadius: 'var(--radius-lg)',
-            fontSize: '0.86rem',
-            marginBottom: '26px'
-          }}
-        >
-          <HelpCircle size={16} />
-          <span>{t('app.low_literacy_tip')}</span>
-        </div>
+
 
         {/* Primary Action Buttons with Min 48px Touch Targets */}
         <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
