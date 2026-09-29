@@ -64,6 +64,17 @@ export interface SkinAnalysisResponse {
   timestamp: string;
 }
 
+export interface SkinAnalysisMLResponse {
+  status: 'MODEL_NOT_AVAILABLE' | 'SUCCESS' | 'ABSTAINED' | string;
+  prediction: string | null;
+  raw_probability: number | null;
+  calibrated_confidence: number | null;
+  uncertainty: number | null;
+  requires_professional_review: boolean;
+  model_version: string | null;
+  message: string;
+}
+
 export interface SymptomDifferential {
   condition_name: string;
   educational_summary: string;

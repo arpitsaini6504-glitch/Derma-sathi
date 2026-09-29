@@ -78,6 +78,23 @@ export const api = {
     return res.json();
   },
 
+  async analyzeSkinWithMLService(file: File): Promise<import('../types').SkinAnalysisMLResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await fetch(`${API_BASE}/skin/analyze`, {
+      method: 'POST',
+      headers: { ...getAuthHeader() },
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'ML analysis endpoint failed' }));
+      throw new Error(err.detail || 'Analysis request failed');
+    }
+    return res.json();
+  },
+
   async checkImageQuality(file: File): Promise<ImageQualityMetrics> {
     const formData = new FormData();
     formData.append('file', file);
