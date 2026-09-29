@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Camera,
@@ -10,11 +10,9 @@ import {
   FileText,
   FileCheck2,
   Sparkles,
-  CheckCircle2,
   PhoneCall,
   ArrowRight
 } from 'lucide-react';
-import { api } from '../../services/api';
 
 interface HeroProps {
   onSelectTab: (tab: string) => void;
@@ -22,15 +20,6 @@ interface HeroProps {
 
 export const HeroOverview: React.FC<HeroProps> = ({ onSelectTab }) => {
   const { t } = useTranslation();
-  const [healthStatus, setHealthStatus] = useState<any>(null);
-
-  useEffect(() => {
-    async function checkHealth() {
-      const data = await api.getHealthStatus();
-      setHealthStatus(data);
-    }
-    checkHealth();
-  }, []);
 
   const featureCards = [
     {
@@ -201,48 +190,6 @@ export const HeroOverview: React.FC<HeroProps> = ({ onSelectTab }) => {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Backend & Clinical Systems Status */}
-      <div
-        className="glass-card"
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexWrap: 'wrap',
-          gap: '14px',
-          backgroundColor: 'hsl(210, 40%, 98%)'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div
-            style={{
-              width: '42px',
-              height: '42px',
-              borderRadius: '50%',
-              backgroundColor: healthStatus?.status === 'online' ? 'hsl(150, 70%, 90%)' : 'hsl(38, 90%, 90%)',
-              color: healthStatus?.status === 'online' ? 'var(--emerald-500)' : 'var(--amber-500)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
-            }}
-          >
-            <CheckCircle2 size={22} />
-          </div>
-          <div>
-            <h4 style={{ fontSize: '0.95rem' }}>DERMASATHIAI Clinical System: Active</h4>
-            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
-              FastAPI v1 • OpenCV Quality Gate • Safe Abstention Enforced
-            </p>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <span className="badge badge-success">8-Stage Pipeline: Operational</span>
-          <span className="badge badge-pending">Model Store: Awaiting Weights</span>
-        </div>
       </div>
     </div>
   );
