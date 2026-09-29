@@ -1,0 +1,37 @@
+# Environments & secrets
+.env
+.env.local
+*.env
+
+# Python & ML
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+*.db
+*.sqlite3
+
+# Model Artifacts (Never commit large weights to Git)
+backend/model_store/**/*.onnx
+backend/model_store/**/*.pt
+backend/model_store/**/*.pth
+backend/model_store/**/*.bin
+backend/model_store/**/*.h5
+backend/model_store/**/*.tflite
+!backend/model_store/README.md
+
+# Node & Frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+.npm
+.eslintcache
+
+# Logs & OS
+*.log
+.DS_Store
+Thumbs.db

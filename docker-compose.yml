@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dermasathi_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: dermasathidb
+      POSTGRES_USER: dermasathi_user
+      POSTGRES_PASSWORD: dermasathi_secure_db_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U dermasathi_user -d dermasathidb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: dermasathi_backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://dermasathi_user:dermasathi_secure_db_password@db:5432/dermasathidb
+      - SECRET_KEY=dermasathi-production-jwt-secret-replace-with-vault
+      - ENVIRONMENT=production
+      - DEBUG=False
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/model_store:/app/model_store:ro
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: dermasathi_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  postgres_data:
