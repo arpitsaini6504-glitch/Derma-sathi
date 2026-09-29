@@ -27,13 +27,20 @@ const createLocalizedResource = (nativeTitle: string, nativeTagline: string) => 
     name: nativeTitle,
     tagline: nativeTagline
   },
+  nav: hi.nav,
   disclaimer: hi.disclaimer,
+  states: hi.states,
   skin: hi.skin,
   symptoms: hi.symptoms,
+  reports: hi.reports,
+  prescription: hi.prescription,
   meds: hi.meds,
-  wellness: hi.wellness,
+  lifestyle: hi.lifestyle,
+  ayurveda: hi.ayurveda,
   emergency: hi.emergency,
   facilities: hi.facilities,
+  profile: hi.profile,
+  settings: hi.settings,
   voice: hi.voice
 });
 

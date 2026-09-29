@@ -1,19 +1,35 @@
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Upload, Camera, CheckCircle2, AlertCircle, ShieldAlert, Sparkles, RefreshCw } from 'lucide-react';
+import {
+  Upload,
+  Camera,
+  CheckCircle2,
+  AlertTriangle,
+  RefreshCw,
+  Sparkles,
+  UserCheck,
+  ShieldCheck,
+  ChevronRight,
+  Info
+} from 'lucide-react';
 import { api } from '../../services/api';
 import { SkinAnalysisResponse } from '../../types';
 import { VoiceAssistButton } from '../common/VoiceAssistButton';
+import { AIProcessingState } from '../common/AIProcessingState';
+import { UncertaintyState } from '../common/UncertaintyState';
+import { ErrorState } from '../common/ErrorState';
 
-export const SkinAnalysisModule: React.FC = () => {
+type PipelineStep = 'upload' | 'preview_quality' | 'processing' | 'result';
+
+export const SkinAnalysisModule: React.FC<{ onNavigateToClinics?: () => void }> = ({ onNavigateToClinics }) => {
   const { t, i18n } = useTranslation();
+  const [step, setStep] = useState<PipelineStep>('upload');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
-  const [result, setResult] = useState<SkinAnalysisResponse | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<SkinAnalysisResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // Camera stream state
+  // Camera stream
   const [isCameraActive, setIsCameraActive] = useState<boolean>(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -23,7 +39,7 @@ export const SkinAnalysisModule: React.FC = () => {
       const file = e.target.files[0];
       setSelectedFile(file);
       setPreviewUrl(URL.createObjectURL(file));
-      setResult(null);
+      setStep('preview_quality');
       setErrorMessage(null);
     }
   };
@@ -38,14 +54,13 @@ export const SkinAnalysisModule: React.FC = () => {
         videoRef.current.srcObject = stream;
         videoRef.current.play();
       }
-    } catch (err) {
-      console.warn('Camera access denied or unavailable:', err);
-      setErrorMessage('Unable to access device camera. Please upload an image file instead.');
+    } catch {
+      setErrorMessage('Camera access was denied or is not supported. Please select a photo from your device.');
       setIsCameraActive(false);
     }
   };
 
-  const captureCameraFrame = () => {
+  const captureFrame = () => {
     if (!videoRef.current || !canvasRef.current) return;
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -56,10 +71,11 @@ export const SkinAnalysisModule: React.FC = () => {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
       canvas.toBlob((blob) => {
         if (blob) {
-          const file = new File([blob], 'skin_camera_capture.jpg', { type: 'image/jpeg' });
+          const file = new File([blob], 'skin_photo.jpg', { type: 'image/jpeg' });
           setSelectedFile(file);
           setPreviewUrl(URL.createObjectURL(blob));
           stopCamera();
+          setStep('preview_quality');
         }
       }, 'image/jpeg', 0.92);
     }
@@ -74,190 +90,252 @@ export const SkinAnalysisModule: React.FC = () => {
     setIsCameraActive(false);
   };
 
-  const runAnalysis = async () => {
+  const resetFlow = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setAnalysisResult(null);
+    setErrorMessage(null);
+    setStep('upload');
+  };
+
+  const executePipeline = async () => {
     if (!selectedFile) return;
-    setIsAnalyzing(true);
+    setStep('processing');
     setErrorMessage(null);
 
     try {
       const response = await api.analyzeSkinImage(selectedFile, i18n.language);
-      setResult(response);
+      setAnalysisResult(response);
+      setStep('result');
     } catch (err: any) {
-      setErrorMessage(err.message || 'Analysis could not be completed.');
-    } finally {
-      setIsAnalyzing(false);
+      setErrorMessage(err.message || 'Unable to connect to clinical pipeline.');
+      setStep('preview_quality');
     }
   };
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-      <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+    <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+      {/* Step Indicator Header */}
+      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
         <h2>{t('skin.title')}</h2>
         <p style={{ color: 'var(--text-muted)', marginTop: '4px' }}>{t('skin.subtitle')}</p>
+
+        {/* Progress Pills */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '16px' }}>
+          <span className={`badge ${step === 'upload' ? 'badge-pending' : 'badge-success'}`}>
+            {t('skin.step_1_title')}
+          </span>
+          <ChevronRight size={16} style={{ color: 'var(--text-muted)', alignSelf: 'center' }} />
+          <span className={`badge ${step === 'preview_quality' ? 'badge-pending' : step === 'result' ? 'badge-success' : ''}`}>
+            {t('skin.step_2_title')}
+          </span>
+          <ChevronRight size={16} style={{ color: 'var(--text-muted)', alignSelf: 'center' }} />
+          <span className={`badge ${step === 'result' ? 'badge-pending' : ''}`}>
+            {t('skin.step_3_title')}
+          </span>
+        </div>
       </div>
 
-      <div className="glass-card" style={{ marginBottom: '28px' }}>
-        <h3 style={{ fontSize: '1.1rem', marginBottom: '8px' }}>{t('skin.upload_heading')}</h3>
-        <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '18px' }}>
-          {t('skin.upload_instruction')}
-        </p>
+      {/* STEP 1: UPLOAD / CAMERA */}
+      {step === 'upload' && (
+        <div className="glass-card">
+          <h3 style={{ fontSize: '1.15rem', marginBottom: '6px' }}>{t('skin.upload_heading')}</h3>
+          <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginBottom: '20px' }}>
+            {t('skin.upload_instruction')}
+          </p>
 
-        {isCameraActive ? (
-          <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-            <video
-              ref={videoRef}
+          {isCameraActive ? (
+            <div style={{ textAlign: 'center', marginBottom: '16px' }}>
+              <video
+                ref={videoRef}
+                style={{
+                  width: '100%',
+                  maxHeight: '360px',
+                  borderRadius: 'var(--radius-md)',
+                  backgroundColor: '#000'
+                }}
+              />
+              <canvas ref={canvasRef} style={{ display: 'none' }} />
+              <div style={{ marginTop: '14px', display: 'flex', justifyContent: 'center', gap: '12px' }}>
+                <button
+                  className="btn btn-primary"
+                  onClick={captureFrame}
+                  style={{ minHeight: '48px', padding: '12px 24px' }}
+                >
+                  <Camera size={20} />
+                  <span>Snap Photo</span>
+                </button>
+                <button
+                  className="btn btn-outline"
+                  onClick={stopCamera}
+                  style={{ minHeight: '48px', padding: '12px 20px' }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div
               style={{
-                width: '100%',
-                maxHeight: '360px',
+                border: '2px dashed var(--border-subtle)',
+                borderRadius: 'var(--radius-lg)',
+                padding: '40px 20px',
+                textAlign: 'center',
+                backgroundColor: 'var(--bg-main)'
+              }}
+            >
+              <div
+                style={{
+                  width: '64px',
+                  height: '64px',
+                  borderRadius: '50%',
+                  backgroundColor: 'var(--primary-50)',
+                  color: 'var(--primary-600)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 16px'
+                }}
+              >
+                <Camera size={32} />
+              </div>
+
+              <h4 style={{ fontSize: '1.05rem', marginBottom: '8px' }}>
+                Select Photo or Use Camera
+              </h4>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '22px' }}>
+                JPEG, PNG, WebP up to 10MB • Clear focus & bright indirect daylight
+              </p>
+
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                <label
+                  htmlFor="skin-file-picker"
+                  className="btn btn-primary"
+                  style={{ minHeight: '48px', padding: '12px 24px', cursor: 'pointer' }}
+                >
+                  <Upload size={18} />
+                  <span>{t('skin.choose_file')}</span>
+                </label>
+                <input
+                  id="skin-file-picker"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  style={{ display: 'none' }}
+                  onChange={handleFileChange}
+                />
+
+                <button
+                  className="btn btn-outline"
+                  onClick={startCamera}
+                  style={{ minHeight: '48px', padding: '12px 24px' }}
+                >
+                  <Camera size={18} />
+                  <span>{t('skin.take_photo')}</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {errorMessage && (
+            <div style={{ marginTop: '16px' }}>
+              <ErrorState title="Camera Error" description={errorMessage} onRetry={() => setErrorMessage(null)} />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* STEP 2: PREVIEW & IMAGE QUALITY GUIDANCE */}
+      {step === 'preview_quality' && previewUrl && (
+        <div className="glass-card" style={{ animation: 'fadeIn 0.25s ease' }}>
+          <h3 style={{ fontSize: '1.15rem', marginBottom: '6px' }}>Image Preview & Quality Verification</h3>
+          <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
+            Check clarity, lighting, and centering before running the clinical pipeline.
+          </p>
+
+          <div style={{ textAlign: 'center', marginBottom: '18px' }}>
+            <img
+              src={previewUrl}
+              alt="Skin Preview"
+              style={{
+                maxHeight: '280px',
+                maxWidth: '100%',
                 borderRadius: 'var(--radius-md)',
+                objectFit: 'contain',
+                boxShadow: 'var(--shadow-md)',
                 backgroundColor: '#000'
               }}
             />
-            <canvas ref={canvasRef} style={{ display: 'none' }} />
-            <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'center', gap: '12px' }}>
-              <button className="btn btn-primary" onClick={captureCameraFrame}>
-                <Camera size={18} />
-                <span>Snap Photo</span>
-              </button>
-              <button className="btn btn-outline" onClick={stopCamera}>
-                Cancel
-              </button>
-            </div>
           </div>
-        ) : (
+
+          {/* Quality Guidance Checklist */}
           <div
             style={{
-              border: '2px dashed var(--border-subtle)',
-              borderRadius: 'var(--radius-lg)',
-              padding: '36px 20px',
-              textAlign: 'center',
+              padding: '16px',
               backgroundColor: 'var(--bg-main)',
-              cursor: 'pointer',
-              marginBottom: '18px',
-              transition: 'border-color 0.2s'
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-subtle)',
+              marginBottom: '22px'
             }}
           >
-            {previewUrl ? (
-              <div>
-                <img
-                  src={previewUrl}
-                  alt="Skin Preview"
-                  style={{
-                    maxHeight: '260px',
-                    maxWidth: '100%',
-                    borderRadius: 'var(--radius-md)',
-                    objectFit: 'contain',
-                    boxShadow: 'var(--shadow-md)'
-                  }}
-                />
-                <div style={{ marginTop: '12px' }}>
-                  <label htmlFor="skin-upload-input" className="btn btn-outline" style={{ cursor: 'pointer' }}>
-                    <RefreshCw size={16} />
-                    <span>Choose Different Photo</span>
-                  </label>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <div
-                  style={{
-                    width: '60px',
-                    height: '60px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--primary-50)',
-                    color: 'var(--primary-600)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto 16px'
-                  }}
-                >
-                  <Upload size={28} />
-                </div>
-                <h4 style={{ fontSize: '1rem', marginBottom: '6px' }}>Drag & drop or select skin photo</h4>
-                <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '16px' }}>
-                  Supports JPEG, PNG, or WebP up to 10MB
-                </p>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
-                  <label htmlFor="skin-upload-input" className="btn btn-primary" style={{ cursor: 'pointer' }}>
-                    <Upload size={16} />
-                    <span>{t('skin.choose_file')}</span>
-                  </label>
-                  <button className="btn btn-outline" onClick={startCamera}>
-                    <Camera size={16} />
-                    <span>{t('skin.take_photo')}</span>
-                  </button>
-                </div>
-              </div>
-            )}
-            <input
-              id="skin-upload-input"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              style={{ display: 'none' }}
-              onChange={handleFileChange}
-            />
+            <h4 style={{ fontSize: '0.9rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <ShieldCheck size={18} style={{ color: 'var(--primary-600)' }} />
+              Pre-Flight Clarity Checklist
+            </h4>
+            <ul style={{ paddingLeft: '20px', fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <li>✓ Is the skin mark in sharp focus without hand motion blur?</li>
+              <li>✓ Is there even lighting without harsh flash glare?</li>
+              <li>✓ Is the lesion centered without covering clothing or jewelry?</li>
+            </ul>
           </div>
-        )}
 
-        {selectedFile && !isCameraActive && (
-          <div style={{ textAlign: 'center', marginTop: '16px' }}>
+          {errorMessage && (
+            <div style={{ marginBottom: '16px' }}>
+              <ErrorState title="Analysis Failed" description={errorMessage} onRetry={executePipeline} />
+            </div>
+          )}
+
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '14px', flexWrap: 'wrap' }}>
+            <button
+              className="btn btn-outline"
+              onClick={resetFlow}
+              style={{ minHeight: '48px', padding: '12px 20px' }}
+            >
+              <RefreshCw size={18} />
+              <span>Retake Photo</span>
+            </button>
+
             <button
               className="btn btn-primary"
-              disabled={isAnalyzing}
-              onClick={runAnalysis}
-              style={{ minWidth: '220px', padding: '12px 24px', fontSize: '1rem' }}
+              onClick={executePipeline}
+              style={{ minHeight: '48px', padding: '12px 28px', fontSize: '1rem' }}
             >
-              {isAnalyzing ? (
-                <>
-                  <RefreshCw size={18} style={{ animation: 'spin 1s linear infinite' }} />
-                  <span>{t('skin.analyzing')}</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles size={18} />
-                  <span>Execute 8-Stage Analysis</span>
-                </>
-              )}
+              <Sparkles size={18} />
+              <span>Run 8-Stage Safety Analysis</span>
             </button>
           </div>
-        )}
+        </div>
+      )}
 
-        {errorMessage && (
-          <div
-            style={{
-              marginTop: '16px',
-              padding: '12px 16px',
-              backgroundColor: 'hsl(350, 100%, 96%)',
-              color: 'var(--rose-600)',
-              borderRadius: 'var(--radius-md)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px'
-            }}
-          >
-            <AlertCircle size={20} />
-            <span>{errorMessage}</span>
-          </div>
-        )}
-      </div>
+      {/* STEP 3: PROCESSING */}
+      {step === 'processing' && <AIProcessingState />}
 
-      {/* Analysis Results */}
-      {result && (
+      {/* STEP 4: RESULT / UNCERTAINTY / REFERRAL */}
+      {step === 'result' && analysisResult && (
         <div className="glass-card" style={{ animation: 'fadeIn 0.3s ease' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
             <div>
-              <span className={`badge ${result.status === 'SUCCESS' ? 'badge-success' : 'badge-pending'}`}>
-                {result.status}
+              <span className={`badge ${analysisResult.abstained ? 'badge-pending' : 'badge-success'}`}>
+                {analysisResult.status}
               </span>
-              <h3 style={{ marginTop: '8px' }}>Pipeline Assessment Report</h3>
+              <h3 style={{ marginTop: '6px' }}>Clinical Assessment & Referral</h3>
             </div>
+
             <VoiceAssistButton
-              textToSpeak={`${result.clinical_disclaimer}. Referral: ${result.referral.recommended_timeframe}. Instructions: ${result.referral.actionable_instructions.join('. ')}`}
+              textToSpeak={`${analysisResult.abstention_reason || ''}. Referral timeframe: ${analysisResult.referral.recommended_timeframe}. Specialist: ${analysisResult.referral.recommended_specialist}`}
             />
           </div>
 
-          {/* Stage 1: Quality Gate Card */}
+          {/* Quality Gate Verification Scorecard */}
           <div
             style={{
               padding: '16px',
@@ -267,105 +345,83 @@ export const SkinAnalysisModule: React.FC = () => {
               marginBottom: '20px'
             }}
           >
-            <h4 style={{ fontSize: '0.92rem', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <CheckCircle2 size={18} style={{ color: result.quality_gate.is_acceptable ? 'var(--emerald-500)' : 'var(--rose-500)' }} />
-              {t('skin.quality_metrics')} ({result.quality_gate.resolution[0]}x{result.quality_gate.resolution[1]} px)
+            <h4 style={{ fontSize: '0.92rem', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <CheckCircle2 size={18} style={{ color: analysisResult.quality_gate.is_acceptable ? 'var(--emerald-500)' : 'var(--rose-500)' }} />
+              {t('skin.quality_metrics')} ({analysisResult.quality_gate.resolution[0]}x{analysisResult.quality_gate.resolution[1]} px)
             </h4>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
-              <div>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t('skin.clarity')}</span>
-                <p style={{ fontWeight: 600 }}>Score: {result.quality_gate.blur_score}</p>
-              </div>
-              <div>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{t('skin.lighting')}</span>
-                <p style={{ fontWeight: 600 }}>Intensity: {result.quality_gate.brightness_score}/255</p>
-              </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '10px', fontSize: '0.86rem' }}>
+              <div><strong>{t('skin.clarity')}:</strong> {analysisResult.quality_gate.blur_score}</div>
+              <div><strong>{t('skin.lighting')}:</strong> {analysisResult.quality_gate.brightness_score}/255</div>
             </div>
-            <ul style={{ marginTop: '10px', fontSize: '0.85rem', color: 'var(--text-muted)', paddingLeft: '20px' }}>
-              {result.quality_gate.feedback_messages.map((msg, i) => (
-                <li key={i}>{msg}</li>
+            <ul style={{ paddingLeft: '18px', fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: '8px' }}>
+              {analysisResult.quality_gate.feedback_messages.map((m, idx) => (
+                <li key={idx}>{m}</li>
               ))}
             </ul>
           </div>
 
-          {/* Model Status / Abstention Banner */}
-          {result.status === 'MODEL_PENDING_INTEGRATION' && (
-            <div
-              style={{
-                padding: '16px',
-                borderRadius: 'var(--radius-md)',
-                backgroundColor: 'var(--primary-50)',
-                border: '1px solid var(--primary-100)',
-                color: 'var(--primary-700)',
-                marginBottom: '20px'
-              }}
-            >
-              <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                <ShieldAlert size={18} />
-                Model Staging Notice
-              </h4>
-              <p style={{ fontSize: '0.9rem' }}>
-                The computer vision model is currently pending deployment by the ML team in <code>backend/model_store/</code>.
-                The system has abstained from generating speculative predictions and has activated safe care pathways.
-              </p>
-            </div>
+          {/* If Abstained / Model in Staging / Uncertainty */}
+          {analysisResult.abstained && (
+            <UncertaintyState
+              reason={analysisResult.abstention_reason}
+              onRetake={resetFlow}
+              onConsultDoctor={onNavigateToClinics || (() => alert('Directing to registered clinics directory.'))}
+            />
           )}
 
-          {/* Clinical Findings (if calibrated and available) */}
-          {result.findings.length > 0 && (
-            <div style={{ marginBottom: '24px' }}>
+          {/* Clinical Findings ONLY if model was available and confidence was calibrated (Strictly non-diagnostic) */}
+          {!analysisResult.abstained && analysisResult.findings.length > 0 && (
+            <div style={{ marginBottom: '22px' }}>
               <h4>{t('skin.findings_heading')}</h4>
-              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
-                Probabilities reflect algorithmic pattern similarity and do not represent medical certainty.
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {result.findings.map((finding, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      padding: '14px',
-                      borderRadius: 'var(--radius-md)',
-                      border: '1px solid var(--border-subtle)',
-                      backgroundColor: 'var(--bg-card)'
-                    }}
-                  >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontWeight: 600 }}>{finding.category_name}</span>
-                      <span className="badge badge-pending">
-                        Calibrated Confidence: {(finding.calibrated_probability * 100).toFixed(1)}%
-                      </span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' }}>
+                {analysisResult.findings.map((f, i) => (
+                  <div key={i} style={{ padding: '14px', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <strong>{f.category_name}</strong>
+                      <span className="badge badge-pending">Calibrated: {(f.calibrated_probability * 100).toFixed(1)}%</span>
                     </div>
-                    <p style={{ fontSize: '0.86rem', color: 'var(--text-muted)', marginTop: '6px' }}>
-                      {finding.general_information}
-                    </p>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '4px' }}>{f.general_information}</p>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Referral & Safe Guidance */}
+          {/* Referral & Safe Action Recommendations */}
           <div
             style={{
               padding: '18px',
-              borderRadius: 'var(--radius-md)',
               backgroundColor: 'hsl(210, 40%, 98%)',
-              border: '1px solid var(--border-subtle)'
+              borderRadius: 'var(--radius-md)',
+              border: '1px solid var(--border-subtle)',
+              marginBottom: '20px'
             }}
           >
             <h4 style={{ color: 'var(--primary-700)', marginBottom: '8px' }}>{t('skin.referral_heading')}</h4>
-            <p style={{ fontWeight: 600, fontSize: '0.92rem', marginBottom: '10px' }}>
-              {t('skin.timeframe')}: {result.referral.recommended_timeframe}
+            <p style={{ fontWeight: 600, fontSize: '0.92rem', marginBottom: '8px' }}>
+              {t('skin.timeframe')}: {analysisResult.referral.recommended_timeframe}
             </p>
             <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: '12px' }}>
-              {t('skin.specialist')}: {result.referral.recommended_specialist}
+              {t('skin.specialist')}: {analysisResult.referral.recommended_specialist}
             </p>
-            <h5 style={{ fontSize: '0.88rem', marginBottom: '6px' }}>{t('skin.instructions')}</h5>
-            <ul style={{ fontSize: '0.86rem', color: 'var(--text-muted)', paddingLeft: '20px' }}>
-              {result.referral.actionable_instructions.map((inst, i) => (
+
+            <h5 style={{ fontSize: '0.86rem', marginBottom: '6px' }}>{t('skin.instructions')}</h5>
+            <ul style={{ paddingLeft: '20px', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
+              {analysisResult.referral.actionable_instructions.map((inst, i) => (
                 <li key={i} style={{ marginBottom: '4px' }}>{inst}</li>
               ))}
             </ul>
+          </div>
+
+          <div style={{ textAlign: 'center' }}>
+            <button
+              className="btn btn-outline"
+              onClick={resetFlow}
+              style={{ minHeight: '48px', padding: '12px 24px' }}
+            >
+              <RefreshCw size={18} />
+              <span>Start New Photo Analysis</span>
+            </button>
           </div>
         </div>
       )}
