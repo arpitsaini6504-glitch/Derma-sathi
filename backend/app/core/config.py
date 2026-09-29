@@ -39,6 +39,13 @@ class Settings(BaseSettings):
             return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
         return self.CORS_ORIGINS
 
+    @field_validator("SECRET_KEY")
+    @classmethod
+    def validate_secret_key(cls, v: str) -> str:
+        if os.getenv("ENVIRONMENT", "").lower() == "production" and "change-in-production" in v:
+            raise ValueError("CRITICAL SECURITY ERROR: Insecure default SECRET_KEY in production! Provide a cryptographically secure key via .env or environment variable.")
+        return v
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
