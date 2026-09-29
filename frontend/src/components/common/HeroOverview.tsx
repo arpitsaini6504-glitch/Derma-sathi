@@ -10,8 +10,6 @@ import {
   FileText,
   FileCheck2,
   Sparkles,
-  Wifi,
-  WifiOff,
   CheckCircle2,
   PhoneCall,
   ArrowRight,
@@ -27,25 +25,13 @@ interface HeroProps {
 export const HeroOverview: React.FC<HeroProps> = ({ onSelectTab }) => {
   const { t } = useTranslation();
   const [healthStatus, setHealthStatus] = useState<any>(null);
-  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
 
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
     async function checkHealth() {
       const data = await api.getHealthStatus();
       setHealthStatus(data);
     }
     checkHealth();
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
   }, []);
 
   const featureCards = [
@@ -121,10 +107,6 @@ export const HeroOverview: React.FC<HeroProps> = ({ onSelectTab }) => {
       <div style={{ textAlign: 'center', padding: '36px 0 24px' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '14px', flexWrap: 'wrap', justifyContent: 'center' }}>
           <span className="badge badge-pending">PAN-INDIA MULTILINGUAL HEALTHCARE</span>
-          <span className={`badge ${isOnline ? 'badge-success' : 'badge-emergency'}`}>
-            {isOnline ? <Wifi size={13} /> : <WifiOff size={13} />}
-            {isOnline ? t('states.online_badge') : t('states.offline_badge')}
-          </span>
           <VoiceAssistButton
             textToSpeak={`${t('app.name')}. ${t('app.tagline')}. You can tap any card below to start a skin analysis, check symptoms, or assess emergency risks.`}
           />

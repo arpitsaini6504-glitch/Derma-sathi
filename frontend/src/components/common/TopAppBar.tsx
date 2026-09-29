@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Activity, PhoneCall, Menu, Wifi, WifiOff, Sun, Moon } from 'lucide-react';
+import { Activity, PhoneCall, Menu, Sun, Moon } from 'lucide-react';
 import { LanguageSelector } from './LanguageSelector';
 
 interface TopAppBarProps {
@@ -11,23 +11,9 @@ interface TopAppBarProps {
 
 export const TopAppBar: React.FC<TopAppBarProps> = ({ currentTab, onSelectTab, onToggleDrawer }) => {
   const { t } = useTranslation();
-  const [isOnline, setIsOnline] = useState<boolean>(navigator.onLine);
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
     return (document.documentElement.getAttribute('data-theme') as 'light' | 'dark') || 'light';
   });
-
-  useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
 
   const toggleTheme = () => {
     const nextTheme = theme === 'light' ? 'dark' : 'light';
@@ -81,16 +67,6 @@ export const TopAppBar: React.FC<TopAppBarProps> = ({ currentTab, onSelectTab, o
 
         {/* Action Controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          {/* Online/Offline status badge */}
-          <span
-            className={`badge ${isOnline ? 'badge-success' : 'badge-emergency'}`}
-            title={isOnline ? t('app.online_notice') : t('app.offline_notice')}
-            style={{ display: 'inline-flex' }}
-          >
-            {isOnline ? <Wifi size={13} /> : <WifiOff size={13} />}
-            <span>{isOnline ? t('states.online_badge') : t('states.offline_badge')}</span>
-          </span>
-
           {/* Emergency 112/108 calling button */}
           <a
             href="tel:112"
