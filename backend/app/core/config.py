@@ -17,9 +17,14 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "sqlite:///./dermasathi.db"
 
+    # Google Gemini AI Integration
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-3.5-flash"
+
     # ML Model Store configuration
-    DERMASATHI_MODEL_PATH: str = "backend/model_store/v1.0.0/model.onnx"
-    DERMASATHI_MODEL_METADATA: str = "backend/model_store/v1.0.0/metadata.json"
+    DERMASATHI_MODEL_PATH: str = "backend/model_store/model.keras"
+    DERMASATHI_CLASS_MAPPING_PATH: str = "backend/model_store/class_mapping.json"
+    DERMASATHI_MODEL_METADATA: str = "backend/model_store/skin_ai_policy.json"
 
     # Clinical Safety Thresholds
     QUALITY_BLUR_THRESHOLD: float = 60.0  # Laplacian variance threshold

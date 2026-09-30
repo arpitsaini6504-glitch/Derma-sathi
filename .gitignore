@@ -14,14 +14,23 @@ htmlcov/
 *.db
 *.sqlite3
 
-# Model Artifacts (Never commit large weights to Git)
+# Model Artifacts (Never commit large binary model weights to Git)
+*.keras
+*.safetensors
+*.weights.h5
+backend/model_store/**/*.keras
 backend/model_store/**/*.onnx
 backend/model_store/**/*.pt
 backend/model_store/**/*.pth
 backend/model_store/**/*.bin
 backend/model_store/**/*.h5
 backend/model_store/**/*.tflite
+backend/model_store/**/*.safetensors
 !backend/model_store/README.md
+!backend/model_store/.gitkeep
+!backend/model_store/**/.gitkeep
+!backend/model_store/**/*.json
+
 
 # Node & Frontend
 node_modules/
@@ -35,3 +44,7 @@ dist-ssr/
 *.log
 .DS_Store
 Thumbs.db
+
+# Cloned Model Source Repository
+model_source_repo/
+external/

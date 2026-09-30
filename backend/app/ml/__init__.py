@@ -29,5 +29,14 @@ __all__ = [
     "ModelLoader",
     "model_loader",
     "SkinInferenceService",
-    "skin_inference_service"
+    "skin_inference_service",
+    "ModelValidationReport",
+    "SafePredictionResult",
+    "ImageQualityGate",
+    "image_quality_gate",
+    "QualityGateConfig",
+    "QualityGateResult",
+    "SkinInferencePipeline",
+    "skin_inference_pipeline",
+    "SkinPrediction",
 ]

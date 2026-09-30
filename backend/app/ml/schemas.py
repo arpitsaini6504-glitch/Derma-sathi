@@ -150,3 +150,25 @@ class SkinAnalysisMLResponse(BaseModel):
         default_factory=SafetyPolicyPlaceholder,
         description="Interface placeholder for future clinical safety & referral policy"
     )
+
+    model_config = {
+        "populate_by_name": True,
+        "json_schema_extra": {
+            "example": {
+                "status": "success",
+                "prediction": {
+                    "class": "Melanocytic nevi",
+                    "score": 0.9320
+                },
+                "model": {
+                    "name": "ResNet50-SkinDisease-Classifier",
+                    "version": "1.0.0"
+                },
+                "quality": {
+                    "passed": True,
+                    "flags": []
+                },
+                "requires_professional_review": True
+            }
+        }
+    }

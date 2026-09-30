@@ -6,7 +6,14 @@ import {
   LifestyleGuidanceResponse,
   EmergencyAssessmentResponse,
   HealthcareFacility,
-  User
+  User,
+  MedicalReportAnalysisResponse,
+  ReportAnalyzerStatus,
+  PrescriptionAnalysisResponse,
+  MedicationScheduleResponse,
+  MedicationReminderItem,
+  ReminderActionResponse,
+  PrescriptionMedicineItem
 } from '../types';
 
 const API_BASE = '/api/v1';
@@ -41,7 +48,7 @@ export const api = {
     }
   },
 
-  async login(email: string, password: string):Promise<{ access_token: string; user: User }> {
+  async login(email: string, password: string): Promise<{ access_token: string; user: User }> {
     const res = await fetch(`${API_BASE}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -202,5 +209,231 @@ export const api = {
     const res = await fetch(`${API_BASE}/healthcare-access/facilities`);
     if (!res.ok) throw new Error('Healthcare facilities request failed');
     return res.json();
+  },
+
+  async getReportAnalyzerStatus(): Promise<ReportAnalyzerStatus> {
+    try {
+      const res = await fetch(`${API_BASE}/reports/status`);
+      if (!res.ok) throw new Error('Status failed');
+      return await res.json();
+    } catch {
+      return {
+        gemini_configured: false,
+        model: 'gemini-1.5-flash',
+        supported_formats: ['.pdf', '.jpg', '.jpeg', '.png', '.webp'],
+        max_upload_size_mb: 10
+      };
+    }
+  },
+
+  async analyzeMedicalReport(
+    file: File,
+    language: string = 'en',
+    apiKey?: string
+  ): Promise<MedicalReportAnalysisResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('language', language);
+    if (apiKey && apiKey.trim()) {
+      formData.append('gemini_api_key', apiKey.trim());
+    }
+
+    const headers: Record<string, string> = {
+      ...getAuthHeader()
+    };
+    if (apiKey && apiKey.trim()) {
+      headers['X-Gemini-API-Key'] = apiKey.trim();
+    }
+
+    const res = await fetch(`${API_BASE}/reports/analyze`, {
+      method: 'POST',
+      headers,
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Medical report analysis failed' }));
+      throw new Error(err.detail || 'Medical report analysis failed');
+    }
+    return res.json();
+  },
+
+  async analyzePrescription(file: File, language: string = 'en'): Promise<PrescriptionAnalysisResponse> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('language', language);
+
+    const res = await fetch(`${API_BASE}/prescriptions/analyze`, {
+      method: 'POST',
+      headers: { ...getAuthHeader() },
+      body: formData
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Prescription analysis failed' }));
+      throw new Error(err.detail || 'Prescription analysis failed');
+    }
+    return res.json();
+  },
+
+  async verifyPrescription(
+    prescriptionId: number,
+    data: {
+      medicines: PrescriptionMedicineItem[];
+      doctor_name?: string;
+      prescription_date?: string;
+      general_advice?: string;
+    }
+  ): Promise<{ success: boolean; prescription_id: number; status: string; verified_medicines: PrescriptionMedicineItem[] }> {
+    const res = await fetch(`${API_BASE}/prescriptions/${prescriptionId}/verify`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Prescription verification failed' }));
+      throw new Error(err.detail || 'Prescription verification failed');
+    }
+    return res.json();
+  },
+
+  async createMedicationSchedules(
+    prescriptionId: number,
+    schedules: Array<{
+      medicine_id?: number;
+      medicine_name: string;
+      dosage: string;
+      frequency: string;
+      times_of_day: string[];
+      start_date: string;
+      duration_days?: number;
+      special_instructions?: string;
+    }>
+  ): Promise<MedicationScheduleResponse[]> {
+    const res = await fetch(`${API_BASE}/prescriptions/${prescriptionId}/create-schedules`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ schedules })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to create medication schedules' }));
+      throw new Error(err.detail || 'Failed to create medication schedules');
+    }
+    return res.json();
+  },
+
+  async getTodayReminders(clientDate?: string): Promise<MedicationReminderItem[]> {
+    const dateParam = clientDate || (() => {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    })();
+
+    const res = await fetch(`${API_BASE}/prescriptions/reminders/today?date=${dateParam}`, {
+      headers: { ...getAuthHeader() }
+    });
+
+    if (!res.ok) {
+      return [];
+    }
+    return res.json();
+  },
+
+  async updateReminderAction(
+    reminderId: number,
+    action: 'taken' | 'skipped' | 'snooze',
+    snoozeMinutes?: number
+  ): Promise<ReminderActionResponse> {
+    const res = await fetch(`${API_BASE}/prescriptions/reminders/${reminderId}/action`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify({ action, snooze_minutes: snoozeMinutes })
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to update reminder' }));
+      throw new Error(err.detail || 'Failed to update reminder');
+    }
+    return res.json();
+  },
+
+  async listPrescriptions(): Promise<PrescriptionAnalysisResponse[]> {
+    const res = await fetch(`${API_BASE}/prescriptions`, {
+      headers: { ...getAuthHeader() }
+    });
+
+    if (!res.ok) {
+      return [];
+    }
+    return res.json();
+  },
+
+  async getPrescription(prescriptionId: number): Promise<PrescriptionAnalysisResponse> {
+    const res = await fetch(`${API_BASE}/prescriptions/${prescriptionId}`, {
+      headers: { ...getAuthHeader() }
+    });
+
+    if (!res.ok) {
+      throw new Error('Prescription not found');
+    }
+    return res.json();
+  },
+
+  async deletePrescription(prescriptionId: number): Promise<void> {
+    const res = await fetch(`${API_BASE}/prescriptions/${prescriptionId}`, {
+      method: 'DELETE',
+      headers: { ...getAuthHeader() }
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to delete prescription');
+    }
+  },
+
+  async createCustomReminder(data: {
+    medicine_name: string;
+    dosage: string;
+    scheduled_time: string;
+    scheduled_date?: string;
+    notes?: string;
+  }): Promise<MedicationReminderItem> {
+    const res = await fetch(`${API_BASE}/prescriptions/reminders`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: 'Failed to create reminder' }));
+      throw new Error(err.detail || 'Failed to create reminder');
+    }
+    return res.json();
+  },
+
+  async deleteReminder(reminderId: number): Promise<void> {
+    const res = await fetch(`${API_BASE}/prescriptions/reminders/${reminderId}`, {
+      method: 'DELETE',
+      headers: { ...getAuthHeader() }
+    });
+
+    if (!res.ok) {
+      throw new Error('Failed to delete reminder');
+    }
   }
 };

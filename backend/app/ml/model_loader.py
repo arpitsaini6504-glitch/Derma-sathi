@@ -110,3 +110,6 @@ class ModelLoader:
 
 # Global Singleton ModelLoader instance
 model_loader = ModelLoader()
+
+# Global Singleton ModelLoader instance
+model_loader = ModelLoader()

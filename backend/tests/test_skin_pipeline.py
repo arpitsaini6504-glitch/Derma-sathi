@@ -3,8 +3,9 @@ from app.services.skin_pipeline.uncertainty import UncertaintyDetector
 from app.services.skin_pipeline.calibration import ConfidenceCalibrator
 from app.services.skin_pipeline.abstention import AbstentionGate
 
-def test_pipeline_fails_safely_when_model_absent(clear_synthetic_image_bytes):
+def test_pipeline_fails_safely_when_model_absent(clear_synthetic_image_bytes, monkeypatch):
     # Pipeline should not crash, should not invent fake predictions, should set status to MODEL_PENDING_INTEGRATION
+    monkeypatch.setattr(skin_pipeline.model, "is_available", lambda: False)
     response = skin_pipeline.process_image(clear_synthetic_image_bytes)
     assert response.status == "MODEL_PENDING_INTEGRATION"
     assert response.abstained is True

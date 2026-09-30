@@ -1,4 +1,4 @@
-export type SupportedLanguage = 
+export type SupportedLanguage =
   | 'en' // English
   | 'hi' // Hindi
   | 'mr' // Marathi
@@ -157,3 +157,107 @@ export interface HealthcareFacility {
   teleconsult_available: boolean;
   ayushman_bharat_empanelled: boolean;
 }
+
+export interface AbnormalValue {
+  parameter: string;
+  value: string;
+  reference_range?: string;
+  status: 'abnormal' | 'high' | 'low' | 'critical' | 'normal';
+  clinical_significance?: string;
+}
+
+export interface MedicalReportAnalysisResponse {
+  success: boolean;
+  report_title: string;
+  report_type: string;
+  test_date?: string;
+  patient_summary: string;
+  key_findings: string[];
+  abnormal_values: AbnormalValue[];
+  normal_values: string[];
+  doctor_questions: string[];
+  urgency_level: 'routine' | 'monitor' | 'consult_doctor' | 'emergency';
+  conclusion?: string;
+  clinical_notes?: string;
+  clinical_disclaimer: string;
+  timestamp: string;
+}
+
+export interface ReportAnalyzerStatus {
+  gemini_configured: boolean;
+  model: string;
+  supported_formats: string[];
+  max_upload_size_mb: number;
+}
+
+export interface PrescriptionMedicineItem {
+  id?: number;
+  medicine_name: string;
+  strength?: string;
+  dosage?: string;
+  dosage_unit?: string;
+  frequency?: string;
+  route?: string;
+  timing: string[];
+  duration?: string;
+  quantity?: string;
+  special_instructions?: string;
+  is_verified: boolean;
+  is_unclear: boolean;
+  unclear_reason?: string;
+}
+
+export interface PrescriptionAnalysisResponse {
+  status: string;
+  prescription_id: number;
+  filename: string;
+  requires_user_confirmation: boolean;
+  doctor_name?: string;
+  clinic_or_hospital?: string;
+  prescription_date?: string;
+  patient_name?: string;
+  diagnosis_or_symptoms?: string;
+  medicines: PrescriptionMedicineItem[];
+  general_advice?: string;
+  confidence_notes?: string;
+  clinical_safety_notice: string;
+  timestamp: string;
+}
+
+export interface MedicationScheduleResponse {
+  id: number;
+  prescription_id?: number;
+  medicine_name: string;
+  dosage: string;
+  frequency: string;
+  times_of_day: string[];
+  start_date: string;
+  end_date?: string;
+  duration_days?: number;
+  special_instructions?: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface MedicationReminderItem {
+  id: number;
+  schedule_id: number;
+  prescription_id?: number;
+  medicine_name: string;
+  dosage: string;
+  scheduled_time: string;
+  scheduled_date: string;
+  status: 'scheduled' | 'taken' | 'skipped' | 'snoozed' | 'missed';
+  action_timestamp?: string;
+  special_instructions?: string;
+}
+
+export interface ReminderActionResponse {
+  success: boolean;
+  reminder_id: number;
+  status: string;
+  safety_message: string;
+  action_timestamp: string;
+}
+
+

@@ -1,0 +1,22 @@
+{
+  "pipeline": "V2_OPEN_SET_THEN_V1_DISEASE",
+  "v2_model": "v2_open_set/model.keras",
+  "v1_model": "v1_disease/model.keras",
+  "v2_min_accept_probability": 0.30,
+  "v2_other_class": "OTHER_UNSUPPORTED",
+  "default_confidence_threshold": 0.50,
+  "high_risk_confidence_threshold": 0.60,
+  "absolute_abstention_threshold": 0.35,
+  "maximum_normalized_entropy": 0.80,
+  "high_risk_classes": [
+    "Basal cell carcinoma",
+    "Melanoma",
+    "Squamous cell carcinoma"
+  ],
+  "high_risk_low_confidence_action": "ABSTAIN_AND_REFER",
+  "unsupported_action": "ABSTAIN_AND_REFER",
+  "medical_disclaimer_required": true,
+  "professional_review_required": true,
+  "temperature": 1.0,
+  "probabilities_are_not_clinical_certainty": true
+}

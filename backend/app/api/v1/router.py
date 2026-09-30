@@ -8,7 +8,9 @@ from app.api.v1.endpoints import (
     emergency,
     healthcare_access,
     health_check,
-    skin
+    skin,
+    reports,
+    prescriptions
 )
 
 api_router = APIRouter()
@@ -17,6 +19,8 @@ api_router.include_router(health_check.router, prefix="/health", tags=["System H
 api_router.include_router(skin.router, prefix="/skin", tags=["ML Skin Analysis"])
 api_router.include_router(auth.router, prefix="/auth", tags=["Authentication & Profile"])
 api_router.include_router(skin_analysis.router, prefix="/skin-analysis", tags=["Skin Analysis & Quality Gate"])
+api_router.include_router(reports.router, prefix="/reports", tags=["Medical Reports & Gemini Analysis"])
+api_router.include_router(prescriptions.router, prefix="/prescriptions", tags=["Prescription Reader & Medication Reminders"])
 api_router.include_router(symptoms.router, prefix="/symptoms", tags=["Symptom Analysis"])
 api_router.include_router(medications.router, prefix="/medications", tags=["Medication Safety & Drug Interactions"])
 api_router.include_router(wellness.router, prefix="/wellness", tags=["Traditional & Ayurvedic Wellness"])

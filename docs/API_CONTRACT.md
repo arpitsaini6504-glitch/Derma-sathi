@@ -615,8 +615,12 @@ sequenceDiagram
 | `/api/v1/auth/me` | `GET` | **Active** | Yes | JWT Bearer verification |
 | `/api/v1/skin/analyze` | `POST` | **Active Quality Gate** *(Model Pending)* | No | Preprocessing pipeline, `model_store/` ONNX weights |
 | `/api/v1/symptoms/analyze` | `POST` | **Active** | No | Clinical rule-based emergency triage service |
-| `/api/v1/reports/analyze` | `POST` | **Model Pending** | Yes | PaddleOCR / Tesseract & BioBERT NER model |
-| `/api/v1/prescriptions/analyze` | `POST` | **Model Pending** | Yes | TrOCR handwriting recognition model |
+| `/api/v1/reports/analyze` | `POST` | **Active (Gemini 3.5 AI)** | Optional | Google Gemini Multimodal REST API |
+| `/api/v1/prescriptions/analyze` | `POST` | **Active (Gemini 3.5 AI)** | Optional | Google Gemini Multimodal REST API |
+| `/api/v1/prescriptions/{id}/verify` | `POST` | **Active** | Optional | SQLAlchemy Prescription Verification |
+| `/api/v1/prescriptions/{id}/create-schedules` | `POST` | **Active** | Optional | Medication Schedules & Reminders Generator |
+| `/api/v1/prescriptions/reminders/today` | `GET` | **Active** | Optional | Daily Reminders Query Engine |
+| `/api/v1/prescriptions/reminders/{id}/action` | `PATCH` | **Active** | Optional | Reminder Status (Taken / Skipped / Snoozed) |
 | `/api/v1/medicines/interactions`| `POST` | **Active** | No | Clinical pharmacopeia & interaction rule matrix |
 | `/api/v1/voice/transcribe` | `POST` | **Model Pending** | No | Multilingual speech-to-text (IndicWhisper) |
 | `/api/v1/health` | `GET` | **Active** | No | Database connection ping & model loader registry |

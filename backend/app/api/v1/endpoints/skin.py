@@ -53,8 +53,7 @@ async def analyze_skin(file: UploadFile = File(...)):
     # 3. Create a safe temporary processing path with guaranteed cleanup
     temp_file_path = None
     try:
-        raw_ext = os.path.splitext(os.path.basename(file.filename or "image.jpg"))[1].lower()
-        suffix = raw_ext if raw_ext in settings.ALLOWED_IMAGE_EXTENSIONS else ".jpg"
+        suffix = os.path.splitext(file.filename or "image.jpg")[1] or ".jpg"
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
             temp_file.write(contents)
             temp_file_path = temp_file.name

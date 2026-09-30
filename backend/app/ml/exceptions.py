@@ -2,7 +2,7 @@
 Clinical & ML Service Exceptions for DERMASATHIAI.
 Controlled error definitions to prevent raw system tracebacks from leaking to users.
 """
-from typing import Optional, Any
+from typing import Optional, Any, List
 
 class MLServiceException(Exception):
     """Base exception for all ML subsystem operations."""
@@ -26,6 +26,67 @@ class ModelNotAvailableError(MLServiceException):
     ):
         super().__init__(message, error_code)
         self.quality_assessment = quality_assessment
+
+
+class ModelNotFoundError(ModelNotAvailableError):
+    """Raised when the specified model file does not exist on disk."""
+    def __init__(
+        self,
+        model_path: str,
+        message: Optional[str] = None,
+        error_code: str = "MODEL_NOT_FOUND"
+    ):
+        msg = message or f"Trained model artifact not found at configured path: '{model_path}'."
+        super().__init__(message=msg, error_code=error_code)
+        self.model_path = model_path
+
+
+class ModelFormatError(MLServiceException):
+    """Raised when the model file is not a valid or expected model archive/format."""
+    def __init__(
+        self,
+        message: str = "Model artifact format is invalid or corrupted.",
+        error_code: str = "MODEL_FORMAT_ERROR"
+    ):
+        super().__init__(message, error_code)
+
+
+class ModelInputShapeMismatchError(MLServiceException):
+    """Raised when model input tensor shape does not match documented input shape."""
+    def __init__(
+        self,
+        expected_shape: List[Any],
+        actual_shape: List[Any],
+        message: Optional[str] = None,
+        error_code: str = "MODEL_INPUT_SHAPE_MISMATCH"
+    ):
+        msg = message or f"Model input shape mismatch. Expected {expected_shape}, found {actual_shape}."
+        super().__init__(msg, error_code)
+        self.expected_shape = expected_shape
+        self.actual_shape = actual_shape
+
+
+class ModelClassMappingError(MLServiceException):
+    """Raised when class mapping file is missing, invalid, or length mismatches model output units."""
+    def __init__(
+        self,
+        message: str = "Model class mapping is missing or inconsistent with output dimension.",
+        error_code: str = "MODEL_CLASS_MAPPING_ERROR"
+    ):
+        super().__init__(message, error_code)
+
+
+class ModelRuntimeDependencyError(MLServiceException):
+    """Raised when the required deep-learning framework runtime (e.g. TensorFlow/Keras) is missing."""
+    def __init__(
+        self,
+        framework: str = "TensorFlow / Keras 3",
+        message: Optional[str] = None,
+        error_code: str = "MODEL_RUNTIME_DEPENDENCY_MISSING"
+    ):
+        msg = message or f"Required runtime framework '{framework}' is not installed in the active environment."
+        super().__init__(msg, error_code)
+        self.framework = framework
 
 
 class InvalidImagePayloadError(MLServiceException):
